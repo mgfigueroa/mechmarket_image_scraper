@@ -1,29 +1,19 @@
-import praw
 import queue
 import re
-import json
 from imgur_downloader import ImgurDownloader
 from urlextract import URLExtract
 from time import sleep
-import uuid
+from RedditApi import RedditApi
 
 filename = "account_details.json"
+reddit_api = RedditApi(filename=filename)
 
-if filename:
-    with open(filename, 'r') as f:
-        account_details = json.load(f)
-    
-reddit = praw.Reddit(client_id=account_details["client_id"],
-                     client_secret=account_details["client_secret"],
-                     password=account_details["password"],
-                     user_agent=account_details["user_agent"],
-                     username=account_details["username"])
-print(f'Logged in as {reddit.user.me()}')
+print(f'Logged in as {reddit_api.GetUsername()}')
 q = queue.Queue()
 extractor = URLExtract()
 table = {}
 while(True):
-    for submission in reddit.subreddit('mechmarket').new(limit=10):
+    for submission in reddit_api.GetNewSubmissions():
         if(submission.id not in table):
             print(f'{submission.title} by {submission.author}')
             
